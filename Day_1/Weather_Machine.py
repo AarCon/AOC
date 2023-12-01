@@ -26,9 +26,7 @@ def find_all_string_numbers(string):
     for m in re.finditer(number, string):
       new_list.insert(m.end(), str(number_map[number]))
       count += 1
-      print(count)
   join_list = "".join(new_list)
-  print(string, new_list, join_list)
   return join_list
 
 def weather_machine():
@@ -36,7 +34,6 @@ def weather_machine():
   with open(os.path.join(parent_file_path, "Calibration_Document.txt"), "r") as file:
     for line in file:
       strip = line.strip()
-      print(strip)
       new_line = find_all_string_numbers(strip)
       digits = re.findall(r'\d+', new_line)
       int_string = "".join(list(map(str, digits)))
