@@ -36,9 +36,44 @@ def sum_of_games(game_ids):
     final_sum += int(game_id)
   return final_sum
 
+def update_true_dict(true_game_dict, game_dict):
+  for color in true_game_dict.keys():
+    if game_dict[color] > true_game_dict[color]:
+      true_game_dict[color] = game_dict[color]
+
+
+def get_possible_games(
+    games_list,
+    possible_game,
+    possible_list,
+    game_id,
+    true_game_dict,
+    impossible_list
+  ):
+  for game in games_list:
+    game_dict = get_game_dict(game)
+    update_true_dict(true_game_dict, game_dict)
+    possible = check_game_possibility(game_dict)
+    if possible and possible_game:
+      possible_game = True
+    else:
+      possible_game = False
+  if possible_game:
+    possible_list.append(game_id)
+  else:
+    impossible_list.append(game_id)
+  return possible_game
+
+def multiply_min_game_results(true_game_dict):
+  cube_total = 1
+  for color_value in true_game_dict.values():
+    cube_total *= color_value
+  return cube_total
+
 def bag_game():
   possible_list = []
   impossible_list = []
+  cube_total = 0
   with open(os.path.join(parent_file_path, "Input.txt"), "r") as file:
     for line in file:
       strip  = line.strip()
@@ -48,18 +83,23 @@ def bag_game():
       game_id = game_id_name.split(" ")[1]
       games_list = game_split[1].split("; ")
       possible_game = True
-      for game in games_list:
-        game_dict = get_game_dict(game)
-        possible = check_game_possibility(game_dict)
-        if possible and possible_game:
-          possible_game = True
-        else:
-          possible_game = False
-      if possible_game:
-        possible_list.append(game_id)
-      else:
-        impossible_list.append(game_id)
-  return sum_of_games(possible_list)
+      true_game_dict = {
+        "red": 0,
+        "green": 0,
+        "blue": 0
+      }
+      get_possible_games(
+        games_list,
+        possible_game,
+        possible_list,
+        game_id,
+        true_game_dict,
+        impossible_list
+      )
+      cube_total += multiply_min_game_results(true_game_dict)
+
+  return sum_of_games(possible_list), cube_total
 
 if __name__ == "__main__":
   print(bag_game())
+  ## Part 1 solution was 2439
